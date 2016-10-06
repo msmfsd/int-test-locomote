@@ -6,13 +6,33 @@
     <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/css/materialize.min.css">
     <style>
+      .result-heading {
+        margin: 0;
+      }
+      .result-heading .btn {
+        padding-left: 10px;
+        padding-right: 10px;
+        margin-top: 6px;
+      }
+      .results-p {
+        margin-bottom: 0;
+        padding-bottom: 0;
+      }
+      #status {
+        font-style: italic;
+        padding: 6px;
+        font-family: monospace;
+        font-size: 11px;
+        margin-bottom: 22px;
+      }
       button[disabled=disabled], button:disabled {
         opacity: 0.3;
       }
       li.tab a {
         font-size: 12px;
       }
-      li.tab a.active {
+      li.tab a.active,
+      .card-content {
         background-color: rgba(155,155,155,.1);
       }
       #tabs-content .entries {
@@ -20,19 +40,18 @@
         flex-flow: row wrap;
         justify-content: space-around;
       }
-
       #tabs-content .entries li {
         width: 32%;
         height: auto;
-        margin-bottom: 16px;
+        margin-bottom: 8px;
       }
     </style>
   </head>
   <body>
     <div class="container">
       <div class="row">
-        <div class="col s12">
-          <h3>flight search</h3>
+        <div class="col s12 teal">
+          <h4 class="center-align teal-text text-lighten-4"><i class="small material-icons">find_in_page</i>&nbsp;flight search</h4>
         </div>
       </div>
       <div class="row">
@@ -66,19 +85,23 @@
           <div class="progress"><div class="indeterminate"></div></div>
         </div>
       </div>
-      <div id="result" class="row hide">
-        <div class="col s12">
-          <h5 class="center-align deep-orange white-text">RESULTS</h5>
-        </div>
-        <div class="col s12">
-          <ul id="flights" class="tabs"></ul>
-          <p><small>PRICE - LOW to HIGH</small></p>
-        </div>
-        <div id="tabs-content" class="col s12"></div>
-      </div>
       <div class="row">
         <div class="col s12">
-          <i id="status" class="red-text"></i>
+          <p id="status" class="red white-text hide"></p>
+        </div>
+      </div>
+      <div id="result" class="hide">
+        <div class="row result-heading deep-orange">
+          <div class="col s2"><a id="prev-btn" class="btn white-text" href="#"><i class="material-icons left">arrow_back</i>Prev day</a></div>
+          <div class="col s8"><h5 id="results-date" class="center-align white-text"></h5></div>
+          <div class="col s2"><a id="next-btn" class="btn white-text right" href="#">Next day<i class="material-icons right">arrow_forward</i></a></div>
+        </div>
+        <div class="row">
+          <div class="col s12">
+            <ul id="flights" class="tabs"></ul>
+            <p class="results-p center-align"><small>PRICE - LOW to HIGH</small></p>
+          </div>
+          <div id="tabs-content" class="col s12"></div>
         </div>
       </div>
     </div>

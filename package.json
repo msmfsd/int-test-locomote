@@ -8,7 +8,9 @@
     "start": "node_modules/.bin/npm-run-all --parallel watch:server watch:build",
     "watch:build": "node_modules/.bin/webpack --watch",
     "watch:server": "node_modules/.bin/nodemon \"./server.js\"",
-    "test": "eslint server.js src/"
+    "lint": "eslint server.js src/",
+    "mocha": "mocha --reporter spec --timeout 5000",
+    "test": "npm run lint && npm run mocha"
   },
   "dependencies": {
     "async": "^2.0.0-rc.6",

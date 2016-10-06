@@ -27,19 +27,19 @@ app.use('/public', express.static(path.join(__dirname, 'public')));
 /**
  * Frontend
  */
-app.get('/', function(req, res) { res.sendFile(__dirname + '/index.html') })
+app.get('/', (req, res) => { res.sendFile(__dirname + '/index.html') })
 
 /**
  * API Routes
  */
-app.get('/api/airlines', function(req, res) {
+app.get('/api/airlines', (req, res) => {
   // call external api
   axios.get(API_URL + '/airlines')
-     .then(function(response) { res.send({ success: true, data: response.data })
+     .then((response) => { res.send({ success: true, data: response.data })
      }).catch((reason) => { res.status(500).send({ success: false, message: reason.message }) })
 })
 
-app.get('/api/airports', function(req, res) {
+app.get('/api/airports', (req, res) => {
   // query values
   var query = req.query.q.toString()
   // validation
@@ -48,11 +48,11 @@ app.get('/api/airports', function(req, res) {
   }
   // call external api
   axios.get(API_URL + '/airports?q=' + query)
-     .then(function(response) { res.send({ success: true, data: response.data })
+     .then((response) => { res.send({ success: true, data: response.data })
      }).catch((reason) => { res.status(500).send({ success: false, message: reason.message }) })
 })
 
-app.get('/api/search/:airline_code', function(req, res) {
+app.get('/api/search/:airline_code', (req, res) => {
   // query values
   var date = req.query.date.toString()
   var from = req.query.from.toString()
@@ -66,14 +66,14 @@ app.get('/api/search/:airline_code', function(req, res) {
   var query = airline_code + '?date=' + date + '&from=' + from + '&to=' + to
   // call external api
   axios.get(API_URL + '/flight_search/' + query)
-      .then(function(response) { res.send({ success: true, data: response.data })
+      .then((response) => { res.send({ success: true, data: response.data })
       }).catch((reason) => { res.status(500).send({ success: false, message: reason.message }) })
 })
 
 /**
  * Route not found
  */
-app.use(function(req, res, next) {
+app.use((req, res, next) => {
  var err = new Error('Not Found')
  err.status = 404
  next(err)
@@ -82,7 +82,7 @@ app.use(function(req, res, next) {
 /**
  * Error Handler
  */
-app.use(function (err, req, res) {
+app.use((err, req, res) => {
   if (process.env.NODE_ENV === 'development') { log(err.status) }
   else { delete err.stack }
   var status = err.status || 500
@@ -92,7 +92,7 @@ app.use(function (err, req, res) {
 /**
  * Start Express server.
  */
-app.listen(app.get('port'), function() {
+app.listen(app.get('port'), () => {
   console.log('Express server listening on port %d in %s mode', app.get('port'), app.get('env'))
 })
 

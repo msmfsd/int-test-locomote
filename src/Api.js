@@ -16,7 +16,10 @@ export default class Api {
    * @return {array}
    */
   static async GetFlights (entries) {
+
+    // format date
     let date = moment(new Date(entries.date_range)).format('YYYY-MM-DD')
+
     // get from airport code
     const p1 = await fetch(API_URL + '/airports/?q=' + entries.flight_takeoff, opts)
     const fromAirports = await p1.json()
@@ -25,6 +28,7 @@ export default class Api {
       return false
     }
     const fromAirportCode = fromAirports.data[0].airportCode
+
     // get to airport code
     const p2 = await fetch(API_URL + '/airports/?q=' + entries.flight_land, opts)
     const toAirports = await p2.json()
@@ -33,16 +37,20 @@ export default class Api {
       return false
     }
     const toAirportCode = toAirports.data[0].airportCode
+
     // get airlines
     const p3 = await fetch(API_URL + '/airlines', opts)
     const airlines = await p3.json()
+
     // search results from all airlines
     let promises = airlines.data.map((obj) => {
-      return fetch(API_URL + '/search/' + obj.code + '?date=' + date + '&from=' + fromAirportCode + '&to=' + toAirportCode, opts)
+      let q = obj.code + '?date=' + date + '&from=' + fromAirportCode + '&to=' + toAirportCode
+      return fetch(API_URL + '/search/' + q, opts)
     })
     let results = await Promise.all(promises)
     // resturn result
     return results
+
   }
 
 }

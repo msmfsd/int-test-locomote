@@ -9,34 +9,42 @@ export default class FlightForm {
 
   constructor () {
 
-    // ensure all CDN libs are defined
-    if(typeof $ === 'undefined' || typeof Materialize === 'undefined') {
-      // TODO: load local libs
-      console.log('Error: CDN lib/s not loaded')
-      throw new Error('CDN lib/s not loaded')
-    } else {
-      // vars
-      this.resultsLength = null
-      this.renderCount = null
-      this.flightForm = document.getElementById('flight-form')
-      this.formSubmitBtn = document.getElementById('form-submit-btn')
-      this.preloader = document.getElementById('preloader')
-      this.flightTakeoffInput = document.getElementById('flight_takeoff')
-      this.flightLandInput = document.getElementById('flight_land')
-      this.dateRangeInput = document.getElementById('date_range')
-      this.statusMessage = document.getElementById('status')
-      this.resultDiv = document.getElementById('result')
-      this.flights = document.getElementById('flights')
-      // Materialize components init
-      $('.datepicker').pickadate({ selectMonths: true, selectYears: 15 })
-      // init
-      this.init()
-    }
+    // vars
+    this.resultsLength = null
+    this.renderCount = null
+    this.flightForm = document.getElementById('flight-form')
+    this.formSubmitBtn = document.getElementById('form-submit-btn')
+    this.preloader = document.getElementById('preloader')
+    this.flightTakeoffInput = document.getElementById('flight_takeoff')
+    this.flightLandInput = document.getElementById('flight_land')
+    this.dateRangeInput = document.getElementById('date_range')
+    this.statusMessage = document.getElementById('status')
+    this.resultDiv = document.getElementById('result')
+    this.flights = document.getElementById('flights')
+    this.tabsContent = document.getElementById('tabs-content')
+    this.prevBtn = document.getElementById('prev-btn')
+    this.nextBtn = document.getElementById('next-btn')
+    this.resultsDate = document.getElementById('results-date')
+
+    // init
+    this.init()
 
   }
 
+  /**
+   * Init app
+   */
   init () {
-    // form submit
+
+    // ensure all CDN libs are defined
+    if(typeof $ === 'undefined' || typeof Materialize === 'undefined') {
+      throw new Error('CDN lib/s not loaded')
+    }
+
+    // Materialize datepicker component
+    $('.datepicker').pickadate({ selectMonths: true, selectYears: 15 })
+
+    // form submit actions
     this.flightForm.addEventListener('submit', (event) => {
       event.preventDefault()
       this.submitForm()
@@ -45,99 +53,272 @@ export default class FlightForm {
       event.preventDefault()
       this.submitForm()
     })
+
+    // next/prev actions
+    this.prevBtn.addEventListener('click', (event) => {
+      event.preventDefault()
+      this.submitForm('prev')
+    }, false)
+    this.nextBtn.addEventListener('click', (event) => {
+      event.preventDefault()
+      this.submitForm('next')
+    })
+
   }
 
-  submitForm () {
-    // update display
-    this.formSubmitBtn.disabled = true
-    this.preloader.classList.remove('hide')
-    // reset
-    this.statusMessage.textContent = ''
-    this.resultDiv.classList.add('hide')
-    // validate
-    const date = moment(new Date(this.dateRangeInput.value))
-    const now = moment()
-    if (
-      date.isBefore(now) ||
-      this.flightTakeoffInput.value === '' ||
-      this.flightLandInput.value === '' ||
-      this.dateRangeInput.value === ''
-    ) {
-      this.statusMessage.textContent = 'Please complete all fields correctly. Dates must be today onwards.'
-      this.preloader.classList.add('hide')
-      this.formSubmitBtn.disabled = false
-      return false
+  /**
+   * Form submit
+   * @param {string} day = ''
+   */
+  submitForm (day = '') {
+
+    // if next/prev then modify date range input value
+    if (day === 'prev') {
+      this.dateRangeInput.value = moment(new Date(this.dateRangeInput.value))
+          .add(-1, 'days').format('D MMMM, YYYY')
+    }
+    if (day === 'next') {
+      this.dateRangeInput.value = moment(new Date(this.dateRangeInput.value))
+          .add(1, 'days').format('D MMMM, YYYY')
     }
 
+    // manual validate - TODO: automate
+    const validateResult = this.validate([
+      { value: this.flightTakeoffInput.value, type: 'text', name: 'From location' },
+      { value: this.flightLandInput.value, type: 'text', name: 'To location' },
+      { value: this.dateRangeInput.value, type: 'text', name: 'Travel date' },
+      { value: this.dateRangeInput.value, type: 'date', name: 'Travel date' }
+    ])
+
+    // update display
+    if(validateResult.length > 0) {
+      this.updateDisplay(
+        [this.preloader],
+        [this.statusMessage],
+        [],
+        [this.formSubmitBtn],
+        validateResult.join(' ')
+      )
+      return false
+    } else {
+      this.updateDisplay(
+        [this.statusMessage, this.resultDiv],
+        [this.preloader],
+        [this.formSubmitBtn],
+        [],
+        ''
+      )
+    }
 
     // form data
     let formData = new FormData(this.flightForm)
     const entries = {}
     for (var [key, value] of formData.entries()) { entries[key] = value }
 
-    // call API
+    // get flights
+    this.getFlights(entries)
+
+  }
+
+  /**
+   * Get flights
+   * @param {object} entries
+   */
+  getFlights (entries) {
+
+    // initiate async fetch
     Api.GetFlights(entries)
           .then(responses => {
+
             // reset render
-            $('#flights').empty()
-            $('#tabs-content').empty()
-            this.resultsLength = responses.length
-            this.renderCount = 0
-            // responses is a Promise.all array of objects arrays,
-            // resolve all response objects data and call render on each
-            // NOTE: async so render order may not be sequential
+            this.resetRender(responses.length)
+
+            // loop all promises and render data
             for(let i = 0; i < responses.length; i++) {
               if(!responses[i].ok) {
-                this.preloader.classList.add('hide')
-                this.statusMessage.textContent = '500 Internal Server Error: no results returned'
-                this.formSubmitBtn.disabled = false
+                this.updateDisplay(
+                  [this.preloader],
+                  [this.statusMessage],
+                  [],
+                  [this.formSubmitBtn],
+                  'Server Error: no results returned'
+                )
                 return false
               }
               let p = responses[i].json()
               p.then(response => { this.render(response.data) })
             }
+
           })
           .catch((reason) => {
-            this.preloader.classList.add('hide')
-            this.statusMessage.textContent = 'Server Error: ' + reason.message
-            this.formSubmitBtn.disabled = false
+            this.updateDisplay(
+              [this.preloader],
+              [this.statusMessage],
+              [],
+              [this.formSubmitBtn],
+              'Server Error: ' + reason.message
+            )
           })
   }
 
+  /**
+   * Render data to html
+   * @param {object} data
+   */
   render (data) {
 
+    // construct flight items and sort by cheapest
     const flights = data.map((obj) => {
-      let start = moment(new Date(obj.start.dateTime)).format('MMMM Do YYYY, h:mm:ss a')
-      let finish = moment(new Date(obj.finish.dateTime)).format('MMMM Do YYYY, h:mm:ss a')
-      let entry = '<li><div class="card horizontal hoverable">'
+
+      // vars
+      let entry = ''
+      let heading = moment(new Date(obj.start.dateTime))
+          .format('MMMM Do YYYY')
+      let start = moment(new Date(obj.start.dateTime))
+          .format('MMMM Do YYYY, h:mm:ss a')
+      let finish = moment(new Date(obj.finish.dateTime))
+          .format('MMMM Do YYYY, h:mm:ss a')
+
+      // html
+      entry += '<li><div class="card horizontal hoverable">'
       entry += '<div class="card-content">'
-      entry += '<h5 class="teal-text text-darken-2">' + obj.airline.code + obj.flightNum + '</h5>'
-      entry += '<p>'
-      entry += 'From: <b>' + obj.start.cityName + '</b><br /><span class="teal-text text-darken-2">' + start + '</span><br />'
-      entry += 'To: <b>' + obj.finish.cityName + '</b><br /><span class="teal-text text-darken-2">' + finish + '</span><br />'
-      entry += 'Price: <b>&#36;' + obj.price + '</b>'
-      entry += '</p>'
+      entry += '<h5 class="teal-text text-darken-2">' +
+                obj.airline.code + obj.flightNum + '</h5>'
+      entry += '<p>From: <b>' + obj.start.cityName +
+                '</b><br /><span class="teal-text text-darken-2">' + start +
+                '</span><br />'
+      entry += 'To: <b>' + obj.finish.cityName +
+                '</b><br /><span class="teal-text text-darken-2">' + finish +
+                '</span><br />'
+      entry += 'Price: <b>&#36;' + obj.price + '</b></p>'
       entry += '</div>'
-      entry += '<div class="card-action"><a href="#" class="waves-effect waves-light btn"><i class="material-icons left">flight</i>Make Booking</a></div>'
-      entry += '</div></li>'
-      return { price: obj.price, entry: entry, title: obj.airline.name, id: obj.airline.code }
+      entry += '<div class="card-action">'
+      entry += '<a href="#" class="waves-effect waves-light btn">'
+      entry += '<i class="material-icons">flight</i></a>&nbsp;&nbsp;'
+      entry += '<a href="#" class="waves-effect waves-light btn">'
+      entry += '<i class="material-icons">share</i></a>'
+      entry += '</div></div></li>'
+
+      // save to array
+      return {
+        price: obj.price,
+        entry: entry,
+        title: obj.airline.name,
+        id: obj.airline.code,
+        heading: heading
+      }
+
     }).sort((a, b) => { return parseFloat(a.price) - parseFloat(b.price) })
 
-    // tab heading
+    // set main results heading to current start date
+    this.resultsDate.textContent = flights[0].heading
+
+    // set tab headings - use jQuery for append..
     let activeClass = this.renderCount === 0 ? 'active' : ''
-    $('#flights').append('<li class="tab col s3"><a class="' + activeClass + '" href="#' + flights[0].id + '">' + flights[0].title + '</a></li>')
-    // tab content
+    $('#flights').append(
+      '<li class="tab col s3"><a class="' + activeClass + '" href="#' +
+      flights[0].id + '">' + flights[0].title + '</a></li>'
+    )
+
+    // set tab content - use jQuery for append..
     const content = flights.map(obj => obj.entry).join('')
-    $('#tabs-content').append('<ul id="' + flights[0].id + '" class="entries">' + content + '</ul>')
+    $('#tabs-content').append(
+      '<ul id="' + flights[0].id + '" class="entries">' + content + '</ul>'
+    )
 
     // update display on final render
     if(this.renderCount === this.resultsLength-1) {
+      // Materialize tabs component after render
       setTimeout(() => { $('ul.tabs').tabs() }, 100)
-      this.preloader.classList.add('hide')
-      this.resultDiv.classList.remove('hide')
-      this.formSubmitBtn.disabled = false
+      // show results
+      this.updateDisplay(
+        [this.preloader],
+        [this.resultDiv],
+        [],
+        [this.formSubmitBtn],
+        ''
+      )
     } else {
       this.renderCount++
+    }
+
+  }
+
+  /**
+   * Validate form input
+   * @param {array} inputs
+   * @return {array}
+   */
+  validate (inputs) {
+
+    // validate
+    const validateResult = []
+    inputs.map(input => {
+
+      // text
+      if(input.type === 'text' && input.value === '') {
+        validateResult.push(input.name + ' cannot be empty.')
+      }
+
+      // date
+      if(input.type === 'date') {
+        const date = moment(new Date(input.value))
+        const now = moment()
+        if(date.endOf('day').isBefore(now)) {
+          validateResult.push(input.name + ' cannot be in the past.')
+        }
+      }
+
+    })
+
+    // result
+    return validateResult
+
+  }
+
+  /**
+   * Update display
+   * @param {array} hide
+   * @param {array} show
+   * @param {array} disable
+   * @param {array} enable
+   * @param {string} statusText
+   */
+  updateDisplay (hide, show, disable, enable, statusText) {
+
+    // hide?
+    hide.map(val => { val.classList.add('hide') })
+
+    // show?
+    show.map(val => { val.classList.remove('hide') })
+
+    // disable?
+    disable.map(val => { val.disabled = true })
+
+    // enable?
+    enable.map(val => { val.disabled = false })
+
+    // update statusMessage
+    this.statusMessage.textContent = statusText
+
+  }
+
+  /**
+   * Reset render vars and clear rendered html
+   * @param {number} responsesLength
+   */
+  resetRender (responsesLength) {
+
+    // use class count vars as async order may not be sequential
+    this.resultsLength = responsesLength
+    this.renderCount = 0
+
+    // clear render
+    while(this.flights.firstChild) {
+      this.flights.removeChild(this.flights.firstChild)
+    }
+    while(this.tabsContent.firstChild) {
+      this.tabsContent.removeChild(this.tabsContent.firstChild)
     }
 
   }

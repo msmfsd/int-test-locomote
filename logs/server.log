@@ -2194,3 +2194,8 @@
 {"ip":"::ffff:127.0.0.1","method":"GET","status":200,"url":"/api/airlines","response":"640.26","level":"info","message":"logger-request","timestamp":"2016-10-06T05:56:02.058Z"}
 {"ip":"::ffff:127.0.0.1","method":"GET","status":200,"url":"/api/airports/?q=Melbourne","response":"454.34","level":"info","message":"logger-request","timestamp":"2016-10-06T05:56:02.525Z"}
 {"ip":"::ffff:127.0.0.1","method":"GET","status":200,"url":"/api/search/QF/?date=2017-03-15&from=MEL&to=SYD","response":"2922.50","level":"info","message":"logger-request","timestamp":"2016-10-06T05:56:05.454Z"}
+{"ip":"::1","method":"GET","status":200,"url":"/","response":"16.47","level":"info","message":"logger-request","timestamp":"2016-10-06T06:05:02.221Z"}
+{"ip":"::1","method":"GET","status":200,"url":"/bundle.js","response":"26.63","level":"info","message":"logger-request","timestamp":"2016-10-06T06:05:02.266Z"}
+{"ip":"::1","method":"GET","status":200,"url":"/favicon.ico","response":"9.93","level":"info","message":"logger-request","timestamp":"2016-10-06T06:05:05.533Z"}
+{"ip":"::1","method":"GET","status":404,"url":"/apple-touch-icon-precomposed.png","response":"5.01","level":"info","message":"logger-request","timestamp":"2016-10-06T06:05:05.544Z"}
+{"ip":"::1","method":"GET","status":404,"url":"/apple-touch-icon.png","response":"1.05","level":"info","message":"logger-request","timestamp":"2016-10-06T06:05:05.548Z"}

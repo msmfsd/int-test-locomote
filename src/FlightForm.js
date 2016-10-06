@@ -18,6 +18,7 @@ export default class FlightForm {
     this.flightTakeoffInput = document.getElementById('flight_takeoff')
     this.flightLandInput = document.getElementById('flight_land')
     this.dateRangeInput = document.getElementById('date_range')
+    this.dateRangeFor = document.getElementById('date_range_for')
     this.statusMessage = document.getElementById('status')
     this.resultDiv = document.getElementById('result')
     this.flights = document.getElementById('flights')
@@ -62,6 +63,11 @@ export default class FlightForm {
     this.nextBtn.addEventListener('click', (event) => {
       event.preventDefault()
       this.submitForm('next')
+    })
+
+    // fix materialize display issue
+    this.dateRangeInput.addEventListener('focus', (event) => {
+      this.dateRangeFor.classList.add('active')
     })
 
   }
@@ -110,10 +116,12 @@ export default class FlightForm {
       )
     }
 
-    // form data
-    let formData = new FormData(this.flightForm)
-    const entries = {}
-    for (var [key, value] of formData.entries()) { entries[key] = value }
+    // TODO: form data API can error on older Safari so manual set
+    const entries = {
+      flight_takeoff: this.flightTakeoffInput.value,
+      flight_land: this.flightLandInput.value,
+      date_range: this.dateRangeInput.value
+    }
 
     // get flights
     this.getFlights(entries)

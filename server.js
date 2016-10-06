@@ -18,7 +18,7 @@ if(process.env.NODE_ENV === 'production') app.disable('x-powered-by')
 /**
  * Middleware
  */
-app.use(logger({ filename: './logs/server.log' }))
+// app.use(logger({ filename: './logs/server.log' }))
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(favicon(__dirname + '/favicon.ico'))

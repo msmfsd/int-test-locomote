@@ -3,12 +3,10 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <title>Locomote test</title>
+    <link rel="shortcut icon" href="/favicon.ico">
     <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/css/materialize.min.css">
     <style>
-      .result-heading {
-        margin: 0;
-      }
       .result-heading .btn {
         padding-left: 10px;
         padding-right: 10px;
@@ -18,12 +16,19 @@
         margin-bottom: 0;
         padding-bottom: 0;
       }
+      #results-date {
+        font-weight: bold;
+      }
       #status {
         font-style: italic;
-        padding: 6px;
+        padding: 10px;
         font-family: monospace;
-        font-size: 11px;
+        font-size: 12px;
+        width: auto;
+        float: right;
         margin-bottom: 22px;
+        display: inline-block;
+        border-radius: 2px;
       }
       button[disabled=disabled], button:disabled {
         opacity: 0.3;
@@ -55,7 +60,7 @@
         </div>
       </div>
       <div class="row">
-        <form id="flight-form" class="col s12">
+        <form id="flight-form" class="col s12" autocomplete="off">
           <div class="row">
             <div class="input-field col s12 m6">
               <i class="material-icons prefix">flight_takeoff</i>
@@ -91,10 +96,10 @@
         </div>
       </div>
       <div id="result" class="hide">
-        <div class="row result-heading deep-orange">
-          <div class="col s2"><a id="prev-btn" class="btn white-text" href="#"><i class="material-icons left">arrow_back</i>Prev day</a></div>
-          <div class="col s8"><h5 id="results-date" class="center-align white-text"></h5></div>
-          <div class="col s2"><a id="next-btn" class="btn white-text right" href="#">Next day<i class="material-icons right">arrow_forward</i></a></div>
+        <div class="row result-heading">
+          <div class="col s2"><a id="prev-btn" class="btn" href="#"><i class="material-icons left">arrow_back</i>Prev day</a></div>
+          <div class="col s8"><h5 id="results-date" class="center-align"></h5></div>
+          <div class="col s2"><a id="next-btn" class="btn right" href="#">Next day<i class="material-icons right">arrow_forward</i></a></div>
         </div>
         <div class="row">
           <div class="col s12">

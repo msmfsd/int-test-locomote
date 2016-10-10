@@ -66,9 +66,11 @@ export default class FlightForm {
     })
 
     // fix materialize display issue
-    this.dateRangeInput.addEventListener('focus', (event) => {
-      this.dateRangeFor.classList.add('active')
-    })
+    setTimeout(() => {
+      this.dateRangeInput.addEventListener('focus', (event) => {
+        this.dateRangeFor.classList.add('active')
+      })
+    }, 100)
 
   }
 
@@ -116,12 +118,12 @@ export default class FlightForm {
       )
     }
 
-    // TODO: form data API can error on older Safari so manual set
-    const entries = {
-      flight_takeoff: this.flightTakeoffInput.value,
-      flight_land: this.flightLandInput.value,
-      date_range: this.dateRangeInput.value
-    }
+    // entries
+    const entries = {}
+    const inputs = [].slice.call(this.flightForm.getElementsByTagName('input'))
+    inputs.forEach(input => {
+      entries[input.name] = input.value
+    })
 
     // get flights
     this.getFlights(entries)
@@ -177,9 +179,10 @@ export default class FlightForm {
 
     // construct flight items and sort by cheapest
     const flights = data.map((obj) => {
-
+      console.log(obj);
       // vars
       let entry = ''
+      let price = obj.price.toFixed(2)
       let heading = moment(new Date(obj.start.dateTime))
           .format('MMMM Do YYYY')
       let start = moment(new Date(obj.start.dateTime))
@@ -192,13 +195,13 @@ export default class FlightForm {
       entry += '<div class="card-content">'
       entry += '<h5 class="teal-text text-darken-2">' +
                 obj.airline.code + obj.flightNum + '</h5>'
-      entry += '<p>From: <b>' + obj.start.cityName +
+      entry += '<p>From: <b>' + obj.start.cityName + ', ' + obj.start.countryName +
                 '</b><br /><span class="teal-text text-darken-2">' + start +
                 '</span><br />'
-      entry += 'To: <b>' + obj.finish.cityName +
+      entry += 'To: <b>' + obj.finish.cityName + ', ' + obj.finish.countryName +
                 '</b><br /><span class="teal-text text-darken-2">' + finish +
                 '</span><br />'
-      entry += 'Price: <b>&#36;' + obj.price + '</b></p>'
+      entry += 'Price: <b>&#36;' + price + '</b></p>'
       entry += '</div>'
       entry += '<div class="card-action">'
       entry += '<a href="#" class="waves-effect waves-light btn">'
@@ -209,7 +212,7 @@ export default class FlightForm {
 
       // save to array
       return {
-        price: obj.price,
+        price: price,
         entry: entry,
         title: obj.airline.name,
         id: obj.airline.code,

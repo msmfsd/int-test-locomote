@@ -24,19 +24,23 @@ export default class Api {
     const p1 = await fetch(API_URL + '/airports/?q=' + entries.flight_takeoff, opts)
     const fromAirports = await p1.json()
     if(fromAirports.data.length < 1) {
-      throw new Error('Airport not found for: ' + entries.flight_takeoff)
+      throw new Error('City not found for: ' + entries.flight_takeoff)
       return false
     }
-    const fromAirportCode = fromAirports.data[0].airportCode
+    let fromAirportCode = fromAirports.data[0].airportCode
+    // NOTE: Search for Melbourne or melb gets Florida so hard code to Australia for this test
+    if(fromAirportCode === 'MLB') fromAirportCode = 'MEL'
 
     // get to airport code
     const p2 = await fetch(API_URL + '/airports/?q=' + entries.flight_land, opts)
     const toAirports = await p2.json()
     if(toAirports.data.length < 1) {
-      throw new Error('Airport not found for: ' + entries.flight_land)
+      throw new Error('City not found for: ' + entries.flight_land)
       return false
     }
-    const toAirportCode = toAirports.data[0].airportCode
+    // NOTE: Search for Melbourne or melb gets Florida so hard code to Australia for this test
+    let toAirportCode = toAirports.data[0].airportCode
+    if(toAirportCode === 'MLB') toAirportCode = 'MEL'
 
     // get airlines
     const p3 = await fetch(API_URL + '/airlines', opts)

@@ -65,12 +65,18 @@ export default class FlightForm {
       this.submitForm('next')
     })
 
-    // fix materialize display issue
-    setTimeout(() => {
-      this.dateRangeInput.addEventListener('focus', (event) => {
-        this.dateRangeFor.classList.add('active')
-      })
-    }, 100)
+    // inputs
+    this.flightTakeoffInput.addEventListener('focus', (event) => {
+      this.updateDisplay([this.statusMessage])
+    })
+    this.flightLandInput.addEventListener('focus', (event) => {
+      this.updateDisplay([this.statusMessage])
+    })
+    this.dateRangeInput.addEventListener('focus', (event) => {
+      this.updateDisplay([this.statusMessage])
+      // fix date input safari/FF issue
+      this.dateRangeFor.classList.add('active')
+    })
 
   }
 
@@ -112,9 +118,7 @@ export default class FlightForm {
       this.updateDisplay(
         [this.statusMessage, this.resultDiv],
         [this.preloader],
-        [this.formSubmitBtn],
-        [],
-        ''
+        [this.formSubmitBtn]
       )
     }
 
@@ -179,7 +183,7 @@ export default class FlightForm {
 
     // construct flight items and sort by cheapest
     const flights = data.map((obj) => {
-      console.log(obj);
+
       // vars
       let entry = ''
       let price = obj.price.toFixed(2)
@@ -246,8 +250,7 @@ export default class FlightForm {
         [this.preloader],
         [this.resultDiv],
         [],
-        [this.formSubmitBtn],
-        ''
+        [this.formSubmitBtn]
       )
     } else {
       this.renderCount++
@@ -295,7 +298,7 @@ export default class FlightForm {
    * @param {array} enable
    * @param {string} statusText
    */
-  updateDisplay (hide, show, disable, enable, statusText) {
+  updateDisplay (hide = [], show = [], disable = [], enable = [], statusText = '') {
 
     // hide?
     hide.map(val => { val.classList.add('hide') })

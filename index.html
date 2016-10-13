@@ -6,59 +6,15 @@
     <link rel="shortcut icon" href="/favicon.ico">
     <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/css/materialize.min.css">
-    <style>
-      .result-heading .btn {
-        padding-left: 10px;
-        padding-right: 10px;
-        margin-top: 6px;
-      }
-      .results-p {
-        margin-bottom: 0;
-        padding-bottom: 0;
-      }
-      #results-date {
-        font-weight: bold;
-      }
-      #status {
-        font-style: italic;
-        padding: 10px;
-        font-family: monospace;
-        font-size: 12px;
-        width: auto;
-        float: right;
-        margin-bottom: 22px;
-        display: inline-block;
-        border-radius: 2px;
-      }
-      button[disabled=disabled], button:disabled {
-        opacity: 0.3;
-      }
-      li.tab a {
-        font-size: 12px;
-      }
-      li.tab a.active,
-      .card-content {
-        background-color: rgba(155,155,155,.1);
-      }
-      #tabs-content .entries {
-        display: flex;
-        flex-flow: row wrap;
-        justify-content: space-around;
-      }
-      #tabs-content .entries li {
-        width: 32%;
-        height: auto;
-        margin-bottom: 8px;
-      }
-    </style>
+    <link rel="stylesheet" href="/public/flight-form.css">
   </head>
   <body>
-    <div class="container">
-      <div class="row">
-        <div class="col s12 teal">
-          <h4 class="center-align teal-text text-lighten-4"><i class="small material-icons">find_in_page</i>&nbsp;flight search</h4>
-        </div>
+    <div class="row">
+      <div class="col s12 teal">
+        <h4 class="center-align teal-text text-lighten-4"><i class="small material-icons">find_in_page</i>&nbsp;flight search</h4>
       </div>
+    </div>
+    <div class="container">
       <div class="row">
         <form id="flight-form" class="col s12" autocomplete="off">
           <div class="row">
@@ -79,23 +35,19 @@
               <input id="date_range" name="date_range" type="date" class="datepicker">
               <label id="date_range_for" for="date_range">Travel date</label>
             </div>
-            <div class="col s12 m6">
-              <button id="form-submit-btn" style="width:90%; float:right" class="btn btn-large waves-effect waves-light" type="submit" name="action">Submit</button>
+            <div class="input-field-submit col s12 m6">
+              <button id="form-submit-btn" class="btn btn-large waves-effect waves-light" type="submit" name="action"><i id="preloader" class="material-icons left hide">settings</i>Submit</button>
             </div>
           </div>
         </form>
       </div>
-      <div id="preloader" class="row hide">
-        <div class="col s12">
-          <div class="progress"><div class="indeterminate"></div></div>
-        </div>
-      </div>
       <div class="row">
         <div class="col s12">
-          <p id="status" class="red white-text hide"></p>
+          <p id="status" class="red lighten-1 white-text hide"></p>
         </div>
       </div>
       <div id="result" class="hide">
+        <hr />
         <div class="row result-heading">
           <div class="col s2"><a id="prev-btn" class="btn" href="#"><i class="material-icons left">arrow_back</i>Prev day</a></div>
           <div class="col s8"><h5 id="results-date" class="center-align"></h5></div>

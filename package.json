@@ -9,7 +9,7 @@
     "watch:build": "node_modules/.bin/webpack --watch",
     "watch:server": "node_modules/.bin/nodemon \"./server.js\"",
     "lint": "eslint server.js src/",
-    "mocha": "mocha --reporter spec --timeout 5000",
+    "mocha": "mocha --reporter spec --timeout 10000",
     "test": "npm run lint && npm run mocha"
   },
   "dependencies": {
